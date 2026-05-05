@@ -109,7 +109,7 @@ export default function AIAssistant({ project, onClose }: AIAssistantProps) {
       updateProject(updated);
     }
     moveProject(project.id, newStatus);
-    onClose();
+    handleClose();
   };
 
   const handleAIPanelConfirm = async (selectedAIs: AIPersona[]) => {
@@ -142,7 +142,7 @@ export default function AIAssistant({ project, onClose }: AIAssistantProps) {
         if (pendingMoveStatus) {
           moveProject(project.id, pendingMoveStatus);
           setPendingMoveStatus(null);
-          onClose();
+          handleClose();
           return;
         }
       } else {
@@ -263,10 +263,15 @@ export default function AIAssistant({ project, onClose }: AIAssistantProps) {
 
     if (isScriptResult(result)) {
       updated.aiData = { ...updated.aiData, script: result.scriptBody, scriptMeta: result.metadata };
+    } else if (Array.isArray(result)) {
+      updated.description = result.join('\n\n---\n\n');
     } else {
-      const finalString = Array.isArray(result) ? result.join('\n\n---\n\n') : (result as string);
-      if (project.status === 'Idea') updated.description = finalString;
-      if (project.status === 'SEO/Publish') updated.aiData = { ...updated.aiData, seoTags: finalString.split(',') };
+      const txt = result as string;
+      if (project.status === 'Idea') updated.description = txt;
+      else if (project.status === 'ElevenLabs') updated.aiData = { ...updated.aiData, elevenLabsScript: txt };
+      else if (project.status === 'Storyboard') updated.aiData = { ...updated.aiData, storyboardPrompts: txt };
+      else if (project.status === 'Thumbnail') updated.aiData = { ...updated.aiData, thumbnailIdeas: txt };
+      else if (project.status === 'SEO/Publish') updated.aiData = { ...updated.aiData, seoTags: txt.split(',').map(t => t.trim()) };
     }
 
     updateProject(updated);
@@ -313,11 +318,11 @@ export default function AIAssistant({ project, onClose }: AIAssistantProps) {
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.9, y: 20 }}
             className="glass-panel"
-            style={{ width: '100%', maxWidth: '1000px', maxHeight: '90vh', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}
+            style={{ width: '100%', maxWidth: '1000px', maxHeight: '90vh', overflow: 'hidden', display: 'flex', flexDirection: 'column', margin: '0 0.5rem' }}
             onClick={e => e.stopPropagation()}
           >
             {/* Header */}
-            <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--card-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ padding: '1rem', borderBottom: '1px solid var(--card-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                 <Sparkles className="float-animation" style={{ color: 'var(--accent)' }} />
                 <div>
@@ -331,7 +336,7 @@ export default function AIAssistant({ project, onClose }: AIAssistantProps) {
             </div>
 
             {/* Content */}
-            <div style={{ padding: '1.5rem', overflowY: 'auto', flex: 1 }}>
+            <div style={{ padding: '1rem', overflowY: 'auto', flex: 1 }}>
 
               {/* Hızlı İşlemler */}
               <div style={{ marginBottom: '2rem' }}>

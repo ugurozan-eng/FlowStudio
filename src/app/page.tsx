@@ -10,24 +10,37 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Home() {
   const { projects } = useVideos();
-  const [selectedProject, setSelectedProject] = useState<VideoProject | null>(null);
+  const [openProjectIds, setOpenProjectIds] = useState<Set<string>>(new Set());
   const [dockOpen, setDockOpen] = useState(true);
 
-  // Aktif projeler: sadece Idea ve Script aşamasındakiler dock'ta gösterilir
-  const activeProjects = projects.filter(p => p.status === 'Idea' || p.status === 'Script');
-
-  const handleDockSelect = (project: VideoProject) => {
-    setSelectedProject(project);
+  const openProject = (project: VideoProject) => {
+    setOpenProjectIds(prev => new Set(prev).add(project.id));
   };
+
+  const closeProject = (id: string) => {
+    setOpenProjectIds(prev => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
+  };
+
+  // Açık projeler
+  const openProjects = projects.filter(p => openProjectIds.has(p.id));
+
+  // Dock'ta gösterilecek aktif projeler
+  const activeProjects = projects.filter(p => p.status === 'Idea' || p.status === 'Script');
 
   return (
     <main style={{ minHeight: '100vh' }}>
       {/* Header */}
       <header style={{
-        padding: '1.5rem 2rem',
+        padding: '1rem 1.5rem',
         display: 'flex',
+        flexWrap: 'wrap',
         justifyContent: 'space-between',
         alignItems: 'center',
+        gap: '0.75rem',
         borderBottom: '1px solid var(--card-border)',
         background: 'rgba(5,5,5,0.5)',
         backdropFilter: 'blur(10px)',
@@ -60,13 +73,15 @@ export default function Home() {
       </header>
 
       {/* Kanban Board */}
-      <KanbanBoard onOpenAI={setSelectedProject} />
+      <KanbanBoard onOpenAI={openProject} />
 
-      {/* AI Assistant Modal */}
-      <AIAssistant
-        project={selectedProject}
-        onClose={() => setSelectedProject(null)}
-      />
+      {openProjects.map(project => (
+        <AIAssistant
+          key={project.id}
+          project={project}
+          onClose={() => closeProject(project.id)}
+        />
+      ))}
 
       {/* ── Paralel Proje Dock ──────────────────────────────────────────── */}
       {activeProjects.length > 0 && (
@@ -75,10 +90,12 @@ export default function Home() {
           animate={{ y: 0, opacity: 1 }}
           style={{
             position: 'fixed',
-            bottom: '1.5rem',
-            right: '1.5rem',
+            bottom: '1rem',
+            right: '1rem',
+            left: '1rem',
             zIndex: 90,
-            width: '280px',
+            maxWidth: '320px',
+            marginLeft: 'auto',
           }}
         >
           {/* Dock Header */}
@@ -133,11 +150,11 @@ export default function Home() {
                 }}
               >
                 {activeProjects.map(project => {
-                  const isActive = selectedProject?.id === project.id;
+                  const isActive = openProjectIds.has(project.id);
                   return (
                     <motion.button
                       key={project.id}
-                      onClick={() => handleDockSelect(project)}
+                      onClick={() => openProject(project)}
                       whileHover={{ backgroundColor: 'rgba(255,255,255,0.05)' }}
                       style={{
                         width: '100%',

@@ -39,7 +39,7 @@ export default function KanbanBoard({ onOpenAI }: KanbanBoardProps) {
   };
 
   return (
-    <div style={{ display: 'flex', gap: '1.5rem', padding: '2rem', overflowX: 'auto', minHeight: 'calc(100vh - 80px)' }}>
+    <div style={{ display: 'flex', gap: '1rem', padding: '1rem 1rem 2rem 1rem', overflowX: 'auto', minHeight: 'calc(100vh - 80px)', WebkitOverflowScrolling: 'touch' }}>
       {STAGES.map((stage) => (
         <div key={stage} className="kanban-column">
           <div className="kanban-header">

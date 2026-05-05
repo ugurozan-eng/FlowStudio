@@ -297,7 +297,7 @@ export default function AISelectionPanel({ onConfirm, onCancel, isLoading }: AIS
               </div>
 
               {/* Persona Cards */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem', marginBottom: '1.25rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem', marginBottom: '1.25rem' }}>
                 {PERSONAS.map(persona => {
                   const isSelected = selected.includes(persona.id);
                   return (

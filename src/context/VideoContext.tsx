@@ -23,6 +23,14 @@ export function VideoProvider({ children }: { children: React.ReactNode }) {
   const [projects, setProjects] = useState<VideoProject[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
   
+// Eski status değerlerini yenilerine eşle — DB uyumluluğu
+const STATUS_MIGRATION: Record<string, VideoStatus> = {
+  'Çekim/Avatar': 'ElevenLabs',
+  'Avatar/Shoot': 'ElevenLabs',
+  'Editing': 'Storyboard',
+  'editing': 'Storyboard',
+};
+
   const fetchProjects = useCallback(async () => {
     const { data, error } = await supabase
       .from('projects')
@@ -35,7 +43,11 @@ export function VideoProvider({ children }: { children: React.ReactNode }) {
       return;
     }
     if (data) {
-      setProjects(data as VideoProject[]);
+      const migrated = (data as VideoProject[]).map(p => ({
+        ...p,
+        status: STATUS_MIGRATION[p.status] || p.status,
+      }));
+      setProjects(migrated);
     }
     setIsLoaded(true);
   }, []);

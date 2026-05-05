@@ -116,6 +116,61 @@ body {
   background: var(--muted);
 }
 
+/* ── MOBİL UYUMLULUK ──────────────────────────────── */
+
+@media (max-width: 768px) {
+  body {
+    overflow-x: auto;
+  }
+
+  .kanban-column {
+    min-width: 260px !important;
+    height: auto !important;
+    min-height: 50vh;
+    padding: 0.75rem !important;
+    border-radius: 14px;
+  }
+
+  .kanban-header {
+    font-size: 0.75rem;
+  }
+
+  .premium-card {
+    padding: 1rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .kanban-column {
+    min-width: 240px !important;
+    padding: 0.5rem !important;
+    border-radius: 12px;
+  }
+
+  .premium-card {
+    padding: 0.75rem !important;
+    border-radius: 10px;
+  }
+}
+
+/* Mobil scroll ipucu */
+@media (max-width: 768px) {
+  .kanban-scroll-hint {
+    display: block;
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.7rem;
+    padding: 0.5rem;
+    opacity: 0.7;
+  }
+}
+
+@media (min-width: 769px) {
+  .kanban-scroll-hint {
+    display: none;
+  }
+}
+
 @keyframes float {
   0% { transform: translateY(0px); }
   50% { transform: translateY(-10px); }
